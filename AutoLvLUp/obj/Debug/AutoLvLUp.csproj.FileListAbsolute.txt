@@ -15,3 +15,6 @@ C:\Users\Joseph\Desktop\AutoLvLUp\AutoLvLUp\obj\Debug\AutoSpellUp.pdb
 C:\Users\dakot\Downloads\AutoLvLUp\AutoLvLUp\AutoLvLUp\bin\Debug\AutoSpellUp.exe.config
 C:\Users\dakot\Downloads\AutoLvLUp\AutoLvLUp\AutoLvLUp\obj\Debug\AutoSpellUp.exe
 C:\Users\dakot\Downloads\AutoLvLUp\AutoLvLUp\AutoLvLUp\obj\Debug\AutoSpellUp.pdb
+C:\Users\dakot\Documents\GitHub\League-Of-Legends\AutoLvLUp\bin\Debug\AutoSpellUp.exe.config
+C:\Users\dakot\Documents\GitHub\League-Of-Legends\AutoLvLUp\obj\Debug\AutoSpellUp.exe
+C:\Users\dakot\Documents\GitHub\League-Of-Legends\AutoLvLUp\obj\Debug\AutoSpellUp.pdb

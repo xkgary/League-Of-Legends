@@ -37,7 +37,6 @@ namespace AutoSpellUp
 
                 var Heal = Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerHeal");
                 var Smite = Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerSmite");
-                var Ignite = Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerIgnite");
 
             if (_Player.ChampionName == "Aatrox") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
                 else if (_Player.ChampionName == "Ahri") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
@@ -360,7 +359,7 @@ namespace AutoSpellUp
                 else if (_Player.ChampionName == "Tryndamere") abilitySequence = new int[] { 3, 2, 1, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
                 else if (_Player.ChampionName == "TwistedFate")
                 {
-                if (Ignite != null && Ignite.Slot != SpellSlot.Unknown)
+                if (_Player.PercentMagicDamageMod > _Player.PercentPhysicalDamageMod)
                 {
                     abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
                     
