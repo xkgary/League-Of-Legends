@@ -18,7 +18,6 @@ namespace AutoSpellUp
             public static string tipo = "";
             private static SpellSlot Smite;
             private static SpellSlot Heal;
-            private static SpellSlot Ignite;
             public static Menu Menu;
             public static AIHeroClient _Player {get { return ObjectManager.Player; } }
 
@@ -363,12 +362,17 @@ namespace AutoSpellUp
                 {
                     abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
                     
-                    tipo = " AP";
+                    tipo = " AD";
                     }
-                    else
+                if (Heal != null && Heal.Slot != SpellSlot.Unknown)
+                {
+                    abilitySequence = new int[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    tipo = " AD";
+                }
+                else
                     {
                     abilitySequence = new int[] { 2, 3, 3, 2, 3, 4, 3, 2, 3, 2, 4, 2, 4, 4, 4, 4, 4, 4 };
-                    tipo = " AD";
+                    tipo = " AP";
                     }
                 }
                 else if (_Player.ChampionName == "Twitch") abilitySequence = new int[] { 3, 2, 1, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
