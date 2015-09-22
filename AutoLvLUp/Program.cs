@@ -359,7 +359,7 @@ namespace AutoSpellUp
                 else if (_Player.ChampionName == "Tryndamere") abilitySequence = new int[] { 3, 2, 1, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
                 else if (_Player.ChampionName == "TwistedFate")
                 {
-                if (_Player.PercentMagicDamageMod > 20)
+                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
                 {
                     abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
                     
