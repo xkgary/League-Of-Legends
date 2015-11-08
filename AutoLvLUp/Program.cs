@@ -1,485 +1,674 @@
-﻿    using System.Linq;
-
 namespace AutoSpellUp
 {
-
     using System;
-    using EloBuddy;
-    using EloBuddy.SDK.Menu;
-    using EloBuddy.SDK.Events;
-    using EloBuddy.SDK.Menu.Values;
+    using System.Linq;
 
+    using EloBuddy;
+    using EloBuddy.SDK.Events;
+    using EloBuddy.SDK.Menu;
 
     internal class Program
+    {
+
+        public static int[] AbilitySequence;
+
+        public static int QOff = 0, WOff = 0, EOff = 0, ROff;
+
+        public static string Tipo = "";
+
+        public static SpellSlot Smite;
+
+        public static SpellSlot Heal;
+
+        public static Menu Menu;
+
+        public static AIHeroClient Player
         {
-
-            public static int[] abilitySequence;
-            public static int qOff = 0, wOff = 0, eOff = 0, rOff = 0;
-            public static string tipo = "";
-            private static SpellSlot Smite;
-            private static SpellSlot Heal;
-            public static Menu Menu;
-            public static AIHeroClient _Player {get { return ObjectManager.Player; } }
-
-
-        static void Main(string[] args)
+            get
             {
-                Loading.OnLoadingComplete += Game_OnStart;
+                return ObjectManager.Player;
+            }
         }
 
-            static void Game_OnStart(EventArgs args)
+
+        private static void Main()
+        {
+            Loading.OnLoadingComplete += Game_OnStart;
+        }
+
+        private static void Game_OnStart(EventArgs args)
+        {
+            Menu = MainMenu.AddMenu("AutoLevelUp", "AutoLevelUp");
+
+            Menu.AddGroupLabel("Dakota's and KarmaPanda's AutoLevelUp");
+            Menu.AddLabel(Player.ChampionName + " loaded. Credits to Dakota and KarmaPanda.");
+
+            var heal = EloBuddy.Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerHeal");
+            var smite = EloBuddy.Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerSmite");
+
+            switch (Player.ChampionName)
             {
-                Menu = MainMenu.AddMenu("AutoLevelUp", "AutoLevelUp");
-
-                Menu.AddGroupLabel("Dakota's AutoLevelUp");
-                Menu.AddLabel(_Player.ChampionName+" loaded. Credits to AAC(L$) and Miku for example script.");
-
-                var Heal = Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerHeal");
-                var Smite = Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerSmite");
-
-            if (_Player.ChampionName == "Aatrox") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Ahri") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Akali") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Alistar") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Amumu") abilitySequence = new int[] { 3, 1, 2, 3, 2, 4, 3, 3, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Anivia") abilitySequence = new int[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Annie") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Ashe") abilitySequence = new int[] { 2, 1, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Azir") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 1, 2, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Blitzcrank") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Brand") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Braum") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Caitlyn") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Cassiopeia") abilitySequence = new int[] { 1, 3, 3, 2, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Chogath") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Corki")
-                {
-                    if (_Player.PercentMagicDamageMod > _Player.PercentPhysicalDamageMod)
+                case "Aatrox":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Ahri":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Akali":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Alistar":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Amumu":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 2, 4, 3, 3, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
+                    break;
+                case "Anivia":
+                    AbilitySequence = new[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Annie":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Ashe":
+                    AbilitySequence = new[] { 2, 1, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Azir":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 1, 2, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3 };
+                    break;
+                case "Blitzcrank":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Brand":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Braum":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Caitlyn":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Cassiopeia":
+                    AbilitySequence = new[] { 1, 3, 3, 2, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Chogath":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Corki":
+                    if (Player.PercentMagicDamageMod > Player.PercentPhysicalDamageMod)
                     {
-                        abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                        tipo = " AP";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " AP";
                     }
                     else
                     {
-                        abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                        tipo = " AD";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " AD";
                     }
-                }
-                else if (_Player.ChampionName == "Darius") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Diana") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "DrMundo") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Draven") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Elise")
-                {
-                    rOff = -1;
-                    if (Smite != null && Smite.Slot !=  SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 2, 1, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Darius":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Diana":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "DrMundo":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Draven":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Elise":
+                    ROff = -1;
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 2, 1, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Evelynn") abilitySequence = new int[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Ezreal")
-                {
-                    if (Heal != null && Heal.Slot != SpellSlot.Unknown)
+                    break;
+                case "Evelynn":
+                    AbilitySequence = new[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Ezreal":
+                    if (heal != null && heal.Slot != SpellSlot.Unknown)
                     {
-                        abilitySequence = new int[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                        tipo = " AD";
+                        AbilitySequence = new[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " AD";
                     }
                     else
                     {
-                        abilitySequence = new int[] { 1, 2, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                        tipo = " AP";
+                        AbilitySequence = new[] { 1, 2, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                        Tipo = " AP";
                     }
-                }
-                else if (_Player.ChampionName == "Ekko") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "FiddleSticks") abilitySequence = new int[] { 2, 3, 1, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Fiora")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 3, 1, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Jungle";
+                    break;
+                case "Ekko":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "FiddleSticks":
+                    AbilitySequence = new[] { 2, 3, 1, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                    break;
+                case "Fiora":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 3, 1, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Jungle";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Fizz") abilitySequence = new int[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Galio") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Gangplank") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Garen") abilitySequence = new int[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Gnar") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Gragas") abilitySequence = new int[] { 1, 3, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Graves") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Hecarim") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Heimerdinger") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Irelia") abilitySequence = new int[] { 3, 1, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Janna") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "JarvanIV")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 3, 1, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Jungler";
+                    break;
+                case "Fizz":
+                    AbilitySequence = new[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Galio":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Gangplank":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Garen":
+                    AbilitySequence = new[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Gnar":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Gragas":
+                    AbilitySequence = new[] { 1, 3, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Graves":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Hecarim":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Heimerdinger":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Irelia":
+                    AbilitySequence = new[] { 3, 1, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Janna":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
+                    break;
+                case "JarvanIV":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 3, 1, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Jax") abilitySequence = new int[] { 3, 1, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Jayce") { abilitySequence = new int[] { 1, 3, 2, 1, 1, 2, 1, 3, 1, 3, 1, 3, 3, 2, 2, 3, 2, 2 }; rOff = -1; }
-                else if (_Player.ChampionName == "Jinx") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Karma") { abilitySequence = new int[] { 1, 3, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 }; rOff = -1; }
-                else if (_Player.ChampionName == "Karthus") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Kassadin") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Katarina") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Kalista") abilitySequence = new int[] { 3, 1, 3, 2, 3, 4, 1, 3, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Kayle")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 3, 1, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Jungler";
+                    break;
+                case "Jax":
+                    AbilitySequence = new[] { 3, 1, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Jayce":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 2, 1, 3, 1, 3, 1, 3, 3, 2, 2, 3, 2, 2 };
+                    ROff = -1;
+                    break;
+                case "Jinx":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Karma":
+                    AbilitySequence = new[] { 1, 3, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    ROff = -1;
+                    break;
+                case "Karthus":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Kassadin":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Katarina":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Kalista":
+                    AbilitySequence = new[] { 3, 1, 3, 2, 3, 4, 1, 3, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Kayle":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 3, 1, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Kennen") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Khazix") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "KogMaw")
-                {
-                    if (Heal != null && Heal.Slot != SpellSlot.Unknown)
+                    break;
+                case "Kennen":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                    break;
+                case "Khazix":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "KogMaw":
+                    if (heal != null && heal.Slot != SpellSlot.Unknown)
                     {
-                        abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                        tipo = " AD";
+                        AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                        Tipo = " AD";
                     }
                     else
                     {
-                        abilitySequence = new int[] { 3, 2, 1, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                        tipo = " AP";
+                        AbilitySequence = new[] { 3, 2, 1, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                        Tipo = " AP";
                     }
-                }
-                else if (_Player.ChampionName == "Leblanc") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 3, 4, 3, 3, 3, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "LeeSin")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Leblanc":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 3, 4, 3, 3, 3, 2, 4, 2, 2 };
+                    break;
+                case "LeeSin":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Leona") abilitySequence = new int[] { 3, 1, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Lissandra") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Lucian") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Lulu") abilitySequence = new int[] { 1, 3, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Lux") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Malphite") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Malzahar") abilitySequence = new int[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Maokai")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 3, 2, 1, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Leona":
+                    AbilitySequence = new[] { 3, 1, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Lissandra":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Lucian":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Lulu":
+                    AbilitySequence = new[] { 1, 3, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
+                    break;
+                case "Lux":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Malphite":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
+                    break;
+                case "Malzahar":
+                    AbilitySequence = new[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Maokai":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 3, 2, 1, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 3, 1, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 3, 1, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "MasterYi") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "MissFortune") abilitySequence = new int[] { 1, 2, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Mordekaiser") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Morgana") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Nami") abilitySequence = new int[] { 2, 1, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Nasus")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 1, 2, 1, 4, 1, 1 };
-                    tipo = " Jungler";
+                    break;
+                case "MasterYi":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "MissFortune":
+                    AbilitySequence = new[] { 1, 2, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                    break;
+                case "Mordekaiser":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Morgana":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Nami":
+                    AbilitySequence = new[] { 2, 1, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Nasus":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 1, 2, 1, 4, 1, 1 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Nautilus") abilitySequence = new int[] { 2, 3, 1, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Nidalee") { abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 }; rOff = -1; }
-                else if (_Player.ChampionName == "Nocturne")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
-                    tipo = " Jungler";
+                    break;
+                case "Nautilus":
+                    AbilitySequence = new[] { 2, 3, 1, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
+                    break;
+                case "Nidalee":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    ROff = -1;
+                    break;
+                case "Nocturne":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Nunu")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 3, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
-                    tipo = " Jungler";
+                    break;
+                case "Nunu":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 3, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Olaf") abilitySequence = new int[] { 2, 1, 3, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Orianna") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Pantheon") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Poppy") abilitySequence = new int[] { 2, 1, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Quinn") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Rammus") abilitySequence = new int[] { 2, 1, 3, 2, 3, 4, 2, 3, 3, 3, 4, 2, 2, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Renekton") abilitySequence = new int[] { 2, 1, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Rengar")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Jungler";
+                    break;
+                case "Olaf":
+                    AbilitySequence = new[] { 2, 1, 3, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Orianna":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Pantheon":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Poppy":
+                    AbilitySequence = new[] { 2, 1, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Quinn":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Rammus":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 3, 4, 2, 3, 3, 3, 4, 2, 2, 1, 1, 4, 1, 1 };
+                    break;
+                case "Renekton":
+                    AbilitySequence = new[] { 2, 1, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Rengar":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Riven")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 2, 1, 3, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Riven":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 2, 1, 3, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Rumble") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "RekSai")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Jungler";
+                    break;
+                case "Rumble":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "RekSai":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Ryze") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 2, 4, 2, 2, 2, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Sejuani") abilitySequence = new int[] { 2, 3, 1, 2, 2, 4, 2, 1, 2, 3, 4, 3, 3, 3, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Shaco")
-                {
-                    if (_Player.PercentMagicDamageMod > _Player.PercentPhysicalDamageMod)
+                    break;
+                case "Ryze":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 2, 4, 2, 2, 2, 3, 4, 3, 3 };
+                    break;
+                case "Sejuani":
+                    AbilitySequence = new[] { 2, 3, 1, 2, 2, 4, 2, 1, 2, 3, 4, 3, 3, 3, 1, 4, 1, 1 };
+                    break;
+                case "Shaco":
+                    if (Player.PercentMagicDamageMod > Player.PercentPhysicalDamageMod)
                     {
-                        abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                        tipo = " AP";
+                        AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                        Tipo = " AP";
                     }
                     else
                     {
-                        abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                        tipo = " AD";
+                        AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " AD";
                     }
-                }
-                else if (_Player.ChampionName == "Shen") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Shyvana") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Singed") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Sion") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Sivir") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Skarner")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 3, 4, 3, 2, 2, 3, 4, 3, 2 };
-                    tipo = " Jungler";
+                    break;
+                case "Shen":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Shyvana":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Singed":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Sion":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Sivir":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Skarner":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 3, 4, 3, 2, 2, 3, 4, 3, 2 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 3, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 3, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Sona") abilitySequence = new int[] { 1, 2, 3, 1, 2, 4, 1, 2, 1, 2, 4, 1, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Soraka") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Swain") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Syndra") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Talon") abilitySequence = new int[] { 2, 3, 1, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Taric") abilitySequence = new int[] { 3, 2, 1, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "TahmKench") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Teemo") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Thresh") abilitySequence = new int[] { 1, 3, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Tristana") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Trundle")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 3, 4, 2, 2, 2, 3, 4, 3, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Sona":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 2, 4, 1, 2, 1, 2, 4, 1, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Soraka":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                    break;
+                case "Swain":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Syndra":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Talon":
+                    AbilitySequence = new[] { 2, 3, 1, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                    break;
+                case "Taric":
+                    AbilitySequence = new[] { 3, 2, 1, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "TahmKench":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Teemo":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Thresh":
+                    AbilitySequence = new[] { 1, 3, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Tristana":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Trundle":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 3, 4, 2, 2, 2, 3, 4, 3, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 1, 3, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 1, 3, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Tryndamere") abilitySequence = new int[] { 3, 2, 1, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "TwistedFate")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    
-                    tipo = " AD";
-                    }
-                if (Heal != null && Heal.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                    tipo = " AD";
-                }
-                else
+                    break;
+                case "Tryndamere":
+                    AbilitySequence = new[] { 3, 2, 1, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "TwistedFate":
+                    if (Player.FlatMagicDamageMod > 0)
                     {
-                    abilitySequence = new int[] { 2, 3, 3, 2, 3, 4, 3, 2, 3, 2, 4, 2, 4, 4, 4, 4, 4, 4 };
-                    tipo = " AP";
-                    }
-                }
-                else if (_Player.ChampionName == "Twitch") abilitySequence = new int[] { 3, 2, 1, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Udyr")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 4, 1, 3, 4, 4, 3, 4, 3, 4, 3, 3, 1, 1, 1, 1, 2, 2, 2 };
-                    tipo = " Jungler";
+                        AbilitySequence = new[] { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                        Tipo = " AP";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 3, 1, 2, 1, 2, 3, 2, 3, 3, 2, 4, 4, 4 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 2, 3, 3, 2, 3, 4, 3, 2, 3, 2, 4, 2, 4, 1, 1, 1, 1, 1 };
+                        Tipo = " AD";
                     }
-                }
-                else if (_Player.ChampionName == "Urgot") abilitySequence = new int[] { 3, 1, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Varus") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Vayne")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Twitch":
+                    AbilitySequence = new[] { 3, 2, 1, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Udyr":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 4, 1, 3, 4, 4, 3, 4, 3, 4, 3, 3, 1, 1, 1, 1, 2, 2, 2 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 3, 2, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 3, 1, 2, 1, 2, 3, 2, 3, 3, 2, 4, 4, 4 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Veigar") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Velkoz") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "Vi")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 3, 1, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Urgot":
+                    AbilitySequence = new[] { 3, 1, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Varus":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Vayne":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 3, 1, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 3, 2, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Viktor") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Vladimir") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Volibear") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                else if (_Player.ChampionName == "Warwick") abilitySequence = new int[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "MonkeyKing") abilitySequence = new int[] { 3, 1, 2, 1, 1, 4, 3, 1, 3, 1, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Xerath") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                else if (_Player.ChampionName == "XinZhao")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 2, 4, 2, 3, 2, 3, 4, 2, 3 };
-                    tipo = " Jungler";
+                    break;
+                case "Veigar":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Velkoz":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "Vi":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 3, 1, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 3, 1, 1, 2, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Yasuo") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Yorick") abilitySequence = new int[] { 2, 3, 1, 3, 3, 4, 3, 2, 3, 1, 4, 2, 1, 2, 1, 4, 2, 1 };
-                else if (_Player.ChampionName == "Zac")
-                {
-                if (Smite != null && Smite.Slot != SpellSlot.Unknown)
-                {
-                    abilitySequence = new int[] { 2, 1, 3, 3, 1, 4, 3, 1, 3, 1, 4, 3, 1, 2, 2, 4, 2, 2 };
-                    tipo = " Jungler";
+                    break;
+                case "Viktor":
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    break;
+                case "Vladimir":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Volibear":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                    break;
+                case "Warwick":
+                    AbilitySequence = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
+                    break;
+                case "MonkeyKing":
+                    AbilitySequence = new[] { 3, 1, 2, 1, 1, 4, 3, 1, 3, 1, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Xerath":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                    break;
+                case "XinZhao":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 2, 4, 2, 3, 2, 3, 4, 2, 3 };
+                        Tipo = " Jungler";
                     }
                     else
                     {
-                    abilitySequence = new int[] { 2, 3, 1, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-                    tipo = " Lane";
+                        AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
+                        Tipo = " Lane";
                     }
-                }
-                else if (_Player.ChampionName == "Zed") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 3, 1, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Ziggs") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Zilean") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-                else if (_Player.ChampionName == "Zyra") abilitySequence = new int[] { 3, 2, 1, 3, 1, 4, 3, 1, 3, 1, 4, 3, 1, 2, 2, 4, 2, 2 };
-
-                Game.OnUpdate += Game_OnUpdate;
+                    break;
+                case "Yasuo":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Yorick":
+                    AbilitySequence = new[] { 2, 3, 1, 3, 3, 4, 3, 2, 3, 1, 4, 2, 1, 2, 1, 4, 2, 1 };
+                    break;
+                case "Zac":
+                    if (smite != null && smite.Slot != SpellSlot.Unknown)
+                    {
+                        AbilitySequence = new[] { 2, 1, 3, 3, 1, 4, 3, 1, 3, 1, 4, 3, 1, 2, 2, 4, 2, 2 };
+                        Tipo = " Jungler";
+                    }
+                    else
+                    {
+                        AbilitySequence = new[] { 2, 3, 1, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
+                        Tipo = " Lane";
+                    }
+                    break;
+                case "Zed":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 3, 1, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Ziggs":
+                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Zilean":
+                    AbilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    break;
+                case "Zyra":
+                    AbilitySequence = new[] { 3, 2, 1, 3, 1, 4, 3, 1, 3, 1, 4, 3, 1, 2, 2, 4, 2, 2 };
+                    break;
             }
 
-            static void Game_OnUpdate(EventArgs args)
-            { //AutoLevelup
-                int qL = _Player.Spellbook.GetSpell(SpellSlot.Q).Level + qOff;
-                int wL = _Player.Spellbook.GetSpell(SpellSlot.W).Level + wOff;
-                int eL = _Player.Spellbook.GetSpell(SpellSlot.E).Level + eOff;
-                int rL = _Player.Spellbook.GetSpell(SpellSlot.R).Level + rOff;
-                if (qL + wL + eL + rL < ObjectManager.Player.Level)
-                {
-                    int[] level = new int[] { 0, 0, 0, 0 };
-                    for (int i = 0; i < ObjectManager.Player.Level; i++)
-                    {
-                        level[abilitySequence[i] - 1] = level[abilitySequence[i] - 1] + 1;
-                    }
-                    if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
-                    if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
-                    if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
-                    if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+            Game.OnUpdate += Game_OnUpdate;
+        }
 
-                }
+        private static void Game_OnUpdate(EventArgs args)
+        {
+            var qL = Player.Spellbook.GetSpell(SpellSlot.Q).Level + QOff;
+            var wL = Player.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
+            var eL = Player.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
+            var rL = Player.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
+
+            if (qL + wL + eL + rL >= ObjectManager.Player.Level)
+            {
+                return;
             }
+
+            var level = new[] { 0, 0, 0, 0 };
+            for (var i = 0; i < ObjectManager.Player.Level; i++)
+            {
+                level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
+            }
+            if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+            if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+            if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+            if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
         }
     }
+}
