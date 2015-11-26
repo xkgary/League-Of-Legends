@@ -232,7 +232,7 @@ namespace AutoSpellUp
                     AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
                     break;
                 case "Kalista":
-                    AbilitySequence = new[] { 3, 1, 3, 2, 3, 4, 1, 3, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+                    AbilitySequence = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
                     break;
                 case "Kayle":
                     if (smite != null && smite.Slot != SpellSlot.Unknown)
@@ -506,7 +506,7 @@ namespace AutoSpellUp
                     AbilitySequence = new[] { 1, 3, 2, 2, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
                     break;
                 case "Tristana":
-                    AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    AbilitySequence = new[] { 3, 2, 1, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
                     break;
                 case "Trundle":
                     if (smite != null && smite.Slot != SpellSlot.Unknown)
