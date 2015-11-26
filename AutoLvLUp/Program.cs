@@ -40,8 +40,8 @@ namespace AutoSpellUp
         {
             Menu = MainMenu.AddMenu("AutoLevelUp", "AutoLevelUp");
 
-            Menu.AddGroupLabel("Dakota's and KarmaPanda's AutoLevelUp");
-            Menu.AddLabel(Player.ChampionName + " loaded. Credits to Dakota and KarmaPanda.");
+            Menu.AddGroupLabel("Sneaky's AutoLevelUp");
+            Menu.AddLabel(Player.ChampionName + " loaded. Credits to Sneaky.");
 
             var heal = EloBuddy.Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerHeal");
             var smite = EloBuddy.Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerSmite");
